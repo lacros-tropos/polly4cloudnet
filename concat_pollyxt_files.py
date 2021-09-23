@@ -16,13 +16,15 @@ import sys
 ## start of user defined area
 
 # set date of measurement here:
-date_of_measurement = "20210912"
+#date_of_measurement = "20210912"
 
 # set location/site of the PollyXT here:
-location = "Mindelo"
+#location = "Mindelo"
 
 # set output path
-output_path = "/lacroshome/cloudnetpy/data/playground"
+#output_path = "/lacroshome/cloudnetpy/data/playground"
+
+# INFO: call of the function main() at the end of this script has to be uncommented, to let this script work correctly!
 
 ## end of user defined area
 
@@ -326,7 +328,7 @@ def concat_pollyxt_files(date_of_measurement, location, output_path):
 
 
 ## call of main function
-main()
+#main()
 
 
 ### EOF ###
