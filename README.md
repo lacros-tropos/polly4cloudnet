@@ -6,7 +6,7 @@ Pollynet_Processing_Chain](https://github.com/PollyNET/Pollynet_Processing_Chain
 ### Usage
 
 ```
-python3 -c "from concat_pollyxt_files import concat_pollyxt_files; concat_pollyxt_files('20210601','Mindelo','.')"
+python3 -c "from concat_pollyxt_files import concat_pollyxt_files; concat_pollyxt_files('20210828','Mindelo','.')"
 ```
 
 ### Output format
