@@ -1,0 +1,46 @@
+netcdf \20210912_mindelo_pollyxt {
+dimensions:
+        time = 1517 ;
+        range = 4000 ;
+variables:
+        double time(time) ;
+                time:long_name = "Time UTC" ;
+                time:units = "hours since 2021-09-12 00:00:00" ;
+        double range(range) ;
+                range:long_name = "Range from instrument" ;
+                range:units = "m" ;
+        int altitude ;
+                altitude:long_name = "Altitude of site" ;
+                altitude:units = "m" ;
+        int wavelength ;
+                wavelength:long_name = "Laser wavelength" ;
+                wavelength:units = "nm" ;
+        double calibration_factor ;
+                calibration_factor:long_name = "Backscatter calibration factor" ;
+                calibration_factor:units = "" ;
+        double height(range) ;
+                height:long_name = "Height above mean sea level" ;
+                height:units = "m" ;
+        float tilt_angle ;
+                tilt_angle:long_name = "Tilt angle from vertical" ;
+                tilt_angle:units = "degrees" ;
+        double beta(time, range) ;
+                beta:long_name = "Attenuated backscatter coefficient at 1064 nm" ;
+                beta:units = "sr^-1 m^-1" ;
+        double vol_depol(time, range) ;
+                vol_depol:long_name = "Volume depolarization ratio at 532 nm" ;
+                vol_depol:units = "" ;
+
+// global attributes:
+                :Data\ Policy = "Each PollyNET site has Principal Investigator(s) (PI), responsible for deployment, maintenance and data collection. Information on which PI is responsible can be gathered via polly@tropos.de. The PI has prio
+rity use of the data collected at the site. The PI is entitled to be informed of any use of that data. Mandatory guidelines for data use and publication: Using PollyNET data or plots (also for presentations/workshops): Please consult with t
+he PI or the PollyNET team (see contact_mail contact) before using data or plots! This will help to avoid misinterpretations of the lidar data and avoid the use of data from periods of malfunction of the instrument. Using PollyNET images/da
+ta on external websites: PIs and PollyNET must be asked for agreement and a link directed to polly.tropos.de must be included. Publishing PollyNET data and/or plots data: Offer authorship for the PI(s)! Acknowledge projects which have made
+the measurements possible according to PI(s) recommendation. PollyNET requests a notification of any published papers or reports or a brief description of other uses (e.g., posters, oral presentations, etc.) of data/plots used from PollyNET
+. This will help us determine the use of PollyNET data, which is helpful in optimizing product development and acquire new funding for future measurements. It also helps us to keep our product-related references up-to-date." ;
+                :location = "Mindelo" ;
+                :institute = "Leibniz Institute for Tropospheric Research (TROPOS)" ;
+                :source = "PollyXT_CPV" ;
+                :history = "this file was concatenated from att_bsc files [\'2021_09_12_Sun_CPV_00_01_01_att_bsc.nc\', \'2021_09_12_Sun_CPV_06_00_01_att_bsc.nc\', \'2021_09_12_Sun_CPV_19_15_12_att_bsc.nc\', \'2021_09_12_Sun_CPV_23_20_55_att
+_bsc.nc\'] and from vol_depol files [\'2021_09_12_Sun_CPV_00_01_01_vol_depol.nc\', \'2021_09_12_Sun_CPV_06_00_01_vol_depol.nc\', \'2021_09_12_Sun_CPV_19_15_12_vol_depol.nc\', \'2021_09_12_Sun_CPV_23_20_55_vol_depol.nc\']" ;
+}
