@@ -1,12 +1,23 @@
 # polly4cloudnet
 
-`concat_pollyxt_files.py` provides a routine for combining the attenuated backscatter at 1064 nm and the calbrated volume depolarization at 532 nm from the [
+`concat_pollyxt_files.py` provides a routine for combining the attenuated backscatter at 1064 nm and the calibrated volume depolarization at 532 nm from the [
 Pollynet_Processing_Chain](https://github.com/PollyNET/Pollynet_Processing_Chain) into one daily file.
 
-### Usage
+This script is only working for location 'Mindelo' at the moment.
 
+### Usage
+The python script now can be used with arg-parsing as follows:
 ```
-python3 -c "from concat_pollyxt_files import concat_pollyxt_files; concat_pollyxt_files('20210828','Mindelo','.')"
+python3 concat_pollyxt_files.py {timestamp} {location} {input_path} {output_path}
+```
+i.e.:
+```
+python3 concat_pollyxt_files.py '20210912' 'Mindelo' '.' '.'
+```
+
+Detailed help will be shown with:
+```
+python3 concat_pollyxt_files.py --help
 ```
 
 ### Output format
