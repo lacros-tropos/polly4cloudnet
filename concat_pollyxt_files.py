@@ -11,49 +11,92 @@ from pathlib import Path
 import re
 import datetime as dt
 import sys
+import argparse
 
 
-## start of user defined area
+### start arg parsing
 
-# set date of measurement here:
-#date_of_measurement = "20210912"
+## Create the parser
+pollyxt_parser = argparse.ArgumentParser(description='Concatenate pollyxt nc-files (att_backscattering@1064nm and vol_depol@532nm) from one day, with input variables: timestamp, location, input_path, output_path')
 
-# set location/site of the PollyXT here:
-#location = "Mindelo"
+## Add the arguments
+pollyxt_parser.add_argument('timestamp',
+                       metavar='timestamp',
+                       type=str,
+                       help='input the timestamp to look for pollyxt datasets')
 
-# set output path
-#output_path = "/lacroshome/cloudnetpy/data/playground"
+pollyxt_parser.add_argument('location',
+                       metavar='location',
+                       type=str,
+                       help='input the location/site of pollyxt measurement')
 
-# INFO: call of the function main() at the end of this script has to be uncommented, to let this script work correctly!
+pollyxt_parser.add_argument('input_path',
+                       metavar='input_path',
+                       type=str,
+                       help='set the input path to the polly datasets, i.e. "/data/level1/polly"')
 
-## end of user defined area
+pollyxt_parser.add_argument('output_path',
+                       metavar='output_path',
+                       type=str,
+                       help='set the output path for the concatenated nc-file')
+
+## Execute the parse_args() method
+args = pollyxt_parser.parse_args()
+### end of arg parsing
 
 
-## start of main function to call subfunctions
+### start of user defined area
+
+## set date of measurement here:
+# i.e. date_of_measurement = "20210912"
+date_of_measurement = args.timestamp
+
+## set location/site of the PollyXT here:
+# i.e. location = "Mindelo"
+location=args.location
+
+## set input path o the polly datasets
+# i.e. input_path="/data/level1/polly"
+# the following subfolders have the structure: "{input_path}/{location}/{YYYY}/{MM}/{DD}"
+# i.e. on rsd2 server the following subfolder structure for location "Mindelo" is "{input_path}/PollyXT_CPV/YYYY/MM/DD"
+input_path=args.input_path
+
+## set output path
+# i.e. output_path = "/lacroshome/cloudnetpy/data/playground"
+output_path = args.output_path
+
+
+
+## INFO: call of the function main() at the end of this script has to be uncommented, to let this script work correctly!
+
+### end of user defined area
+
+
+### start of main function to call subfunctions
 def main():
     # check if output path exists
     out_path=Path(output_path)
     if out_path.exists() == True:
         pass
     else:
-        sys.exit("Output path does not exist.")
+        sys.exit("Output path does not exist. You have to create it first!")
 
     # check if arguments exist
     if 'location' in globals():
         if 'date_of_measurement' in globals():
             # call of function "concat_pollyxt_files"
-            concat_pollyxt_files(date_of_measurement, location, output_path)
+            concat_pollyxt_files(date_of_measurement, location, input_path, output_path)
         else:
-            sys.exit("No location or date of measurment set.")
+            sys.exit("No location or date of measurement set.")
     else:
-        sys.exit("No location or date of measurment set.")
+        sys.exit("No location or date of measurement set.")
 
     return ()
-## end of main function
+### end of main function
 
 
-## start of function concat_pollyxt_files
-def concat_pollyxt_files(date_of_measurement, location, output_path):
+### start of function concat_pollyxt_files
+def concat_pollyxt_files(date_of_measurement, location, input_path, output_path):
     '''
         This function locates multiple files from one day measurements (date_of_measurement: "YYYYMMDD"), containing "Attenuated backscattering" 
         and "Volume depolarization" from level 1 data at a specific site (location: i.e. "Mindelo") obtained by a PollyXT device.
@@ -76,12 +119,14 @@ def concat_pollyxt_files(date_of_measurement, location, output_path):
         loc_path  = "PollyXT_CPV"
     else:
         print("No location/site found with this name.")
+        sys.exit()
         
-    path_to_folder = "/data/level1/polly/{}/{}/{}/{}".format(loc_path,YYYY,MM,DD)
-   
+    path_to_folder = "{}/{}/{}/{}/{}".format(input_path,loc_path,YYYY,MM,DD)
+    
     path_exist = Path(path_to_folder)
     if path_exist.exists() == True:
         print("\nData found for location {} on {}.".format(location,date_of_measurement))
+        print("Data was found in folder: {}".format(path_to_folder))
         print("New nc file '{}' will be generated and stored to '{}'".format(new_file_title, output_path))
         print("Processing...")
     else:
@@ -323,12 +368,12 @@ def concat_pollyxt_files(date_of_measurement, location, output_path):
     # close new_file_ds
     new_file_ds.close()
     
-    return ()
-## end of function concat_att_bsc_vol_depol_files
+    return (print("Done!"))
+### end of function concat_att_bsc_vol_depol_files
 
 
-## call of main function
-#main()
+### call of main function
+main()
 
 
 ### EOF ###
