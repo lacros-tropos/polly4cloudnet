@@ -3,7 +3,6 @@
 `concat_pollyxt_files.py` provides a routine for combining the attenuated backscatter at 1064 nm and the calibrated volume depolarization at 532 nm from the [
 Pollynet_Processing_Chain](https://github.com/PollyNET/Pollynet_Processing_Chain) into one daily file.
 
-This script is only working for location 'Mindelo' at the moment.
 
 ### Usage
 The python script now can be used with arg-parsing as follows:
@@ -25,7 +24,9 @@ optional arguments:
   -o output_path, --output_path output_path
                         set the absolute output path for the resulting, concatenated nc-file
 ```
-i.e.:
+If no input_path is set, this script tries to locate the correct dataset. This is only working for the location 'Mindelo' at the moment and if working on the TROPOS-server.
+
+Here is an example:
 ```
 python3 concat_pollyxt_files.py -t '20210912' -l 'Mindelo' -i '.' -o '.'
 ```
