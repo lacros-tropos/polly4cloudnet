@@ -22,7 +22,7 @@ pollyxt_parser = argparse.ArgumentParser(description='Concatenate pollyxt nc-fil
 ## Add the arguments
 pollyxt_parser.add_argument('-t', '--timestamp', dest='timestamp', metavar='timestamp',
                        type=str,
-                       help='input the timestamp to look for pollyxt datasets')
+                       help='input the timestamp of pollyxt measurement')
 
 pollyxt_parser.add_argument('-l', '--location', dest='location', metavar='location', #default='Mindelo',
                        type=str,
@@ -30,11 +30,11 @@ pollyxt_parser.add_argument('-l', '--location', dest='location', metavar='locati
 
 pollyxt_parser.add_argument('-i', '--input_path', dest='input_path', metavar='input_path', 
                        type=str,
-                       help='set the input path to the polly datasets, i.e. "/data/level1/polly"')
+                       help='set the absolute input path to the polly dataset; if not set, the script tries to find the correct measurement from timestamp and location input')
 
 pollyxt_parser.add_argument('-o', '--output_path', dest='output_path', metavar='output_path',
                        type=str,
-                       help='set the output path for the concatenated nc-file')
+                       help='set the absolute output path for the resulting, concatenated nc-file')
 
 ## Execute the parse_args() method
 args = pollyxt_parser.parse_args()
@@ -78,12 +78,8 @@ def main():
         sys.exit("Output path does not exist. You have to create it first!")
 
     # check if arguments exist
-    if args.location is not None and args.timestamp is not None:
-        print("loc and time set")
-    else:
-        print("loc & time not set")
-    if 'location' in globals():
-        if 'date_of_measurement' in globals():
+    if args.location is not None:
+        if args.timestamp is not None:
             # call of function "concat_pollyxt_files"
             concat_pollyxt_files(date_of_measurement, location, input_path, output_path)
         else:
@@ -114,23 +110,33 @@ def concat_pollyxt_files(date_of_measurement, location, input_path, output_path)
     YYYY = date_of_measurement[0:4]
     MM   = date_of_measurement[4:6]
     DD   = date_of_measurement[6:8]
-
-    if location == "Mindelo" or location == "mindelo":
-        loc_path  = "PollyXT_CPV"
-    else:
-        print("No location/site found with this name.")
-        sys.exit()
         
-    path_to_folder = "{}/{}/{}/{}/{}".format(input_path,loc_path,YYYY,MM,DD)
+    if args.input_path is None:
+  
+        if location == "Mindelo" or location == "mindelo":
+            loc_path  = "PollyXT_CPV"
+            
+            input_path="/data/level1/polly"
+            # input_path="."
+            path_to_folder = "{}/{}/{}/{}/{}".format(input_path,loc_path,YYYY,MM,DD)
+        else:
+            print("No location/site found with this name.")
+            sys.exit()
+        
+    else:
+        path_to_folder = str(input_path)
+        # print(path_to_folder)
     
     path_exist = Path(path_to_folder)
+    # print("\ndetected folder:")
+    # print(path_exist)
     if path_exist.exists() == True:
         print("\nData found for location {} on {}.".format(location,date_of_measurement))
         print("Data was found in folder: {}".format(path_to_folder))
         print("New nc file '{}' will be generated and stored to '{}'".format(new_file_title, output_path))
         print("Processing...")
     else:
-        print("\nNo data found for location {} on {}.\n".format(location,date_of_measurement))
+        print("\nNo data found for location {} on {}. Correct path?\n".format(location,date_of_measurement))
         sys.exit()
         
 
