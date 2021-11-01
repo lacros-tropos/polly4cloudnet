@@ -20,23 +20,19 @@ import argparse
 pollyxt_parser = argparse.ArgumentParser(description='Concatenate pollyxt nc-files (att_backscattering@1064nm and vol_depol@532nm) from one day, with input variables: timestamp, location, input_path, output_path')
 
 ## Add the arguments
-pollyxt_parser.add_argument('timestamp',
-                       metavar='timestamp',
+pollyxt_parser.add_argument('-t', '--timestamp', dest='timestamp', metavar='timestamp',
                        type=str,
                        help='input the timestamp to look for pollyxt datasets')
 
-pollyxt_parser.add_argument('location',
-                       metavar='location',
+pollyxt_parser.add_argument('-l', '--location', dest='location', metavar='location', #default='Mindelo',
                        type=str,
                        help='input the location/site of pollyxt measurement')
 
-pollyxt_parser.add_argument('input_path',
-                       metavar='input_path',
+pollyxt_parser.add_argument('-i', '--input_path', dest='input_path', metavar='input_path', 
                        type=str,
                        help='set the input path to the polly datasets, i.e. "/data/level1/polly"')
 
-pollyxt_parser.add_argument('output_path',
-                       metavar='output_path',
+pollyxt_parser.add_argument('-o', '--output_path', dest='output_path', metavar='output_path',
                        type=str,
                        help='set the output path for the concatenated nc-file')
 
@@ -82,6 +78,10 @@ def main():
         sys.exit("Output path does not exist. You have to create it first!")
 
     # check if arguments exist
+    if args.location is not None and args.timestamp is not None:
+        print("loc and time set")
+    else:
+        print("loc & time not set")
     if 'location' in globals():
         if 'date_of_measurement' in globals():
             # call of function "concat_pollyxt_files"
@@ -115,7 +115,7 @@ def concat_pollyxt_files(date_of_measurement, location, input_path, output_path)
     MM   = date_of_measurement[4:6]
     DD   = date_of_measurement[6:8]
 
-    if location == "Mindelo":
+    if location == "Mindelo" or location == "mindelo":
         loc_path  = "PollyXT_CPV"
     else:
         print("No location/site found with this name.")
