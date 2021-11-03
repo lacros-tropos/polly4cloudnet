@@ -103,21 +103,19 @@ def concat_pollyxt_files(date_of_measurement, location, input_path, output_path)
         The nomenclature follows the one given from cloudnet ( https://cloudnetpy.readthedocs.io/en/latest/fileformat.html )
     '''
     
-    ## generate new nc-file title
-    new_file_title = date_of_measurement + "_" + location.lower() + "_pollyxt.nc"
 
     ## get the desired path_to_folder from "date_of_measurement" and "location"
     YYYY = date_of_measurement[0:4]
     MM   = date_of_measurement[4:6]
     DD   = date_of_measurement[6:8]
         
-    if args.input_path is None:
-  
+    if not input_path:
+        
         if location == "Mindelo" or location == "mindelo":
             loc_path  = "PollyXT_CPV"
             
-            input_path="/data/level1/polly"
-            # input_path="."
+            # input_path="/data/level1/polly"
+            input_path="."
             path_to_folder = "{}/{}/{}/{}/{}".format(input_path,loc_path,YYYY,MM,DD)
         else:
             print("No location/site found with this name.")
@@ -125,68 +123,86 @@ def concat_pollyxt_files(date_of_measurement, location, input_path, output_path)
         
     else:
         path_to_folder = str(input_path)
-        # print(path_to_folder)
+    
     
     path_exist = Path(path_to_folder)
-    # print("\ndetected folder:")
-    # print(path_exist)
+    
     if path_exist.exists() == True:
+        # print("\nData found for location {} on {}.".format(location,date_of_measurement))
+        # print("Data was found in folder: {}".format(path_to_folder))
+        
+
+        ## set the searchpatterns for the att_bsc- & the vol_depol-files:
+        searchpattern_att_bsc   = "*[0-9]_att*.nc"
+        searchpattern_vol_depol = "*[0-9]_vol*.nc"
+        
+        ## get all att_bsc-files in path_to_folder
+        ## and put them into a list
+        
+        att_bsc_files       = Path(r'{}'.format(path_to_folder)).glob('{}'.format(searchpattern_att_bsc))
+        att_bsc_files_list0 = [x for x in att_bsc_files if x.is_file()]
+        
+        ## convert type path to type string
+        att_bsc_files_list = []
+        for file in att_bsc_files_list0:
+            att_bsc_files_list.append(str(file))
+        
+        ## get all vol_depol-_files in path_to_folder
+        ## and put them into a list
+        vol_depol_files       = Path(r'{}'.format(path_to_folder)).glob('{}'.format(searchpattern_vol_depol))
+        vol_depol_files_list0 = [x for x in vol_depol_files if x.is_file()]
+            
+        ## convert type path to type string
+        vol_depol_files_list = []
+        for file in vol_depol_files_list0:
+            vol_depol_files_list.append(str(file))
+        
+        att_bsc_files_no_path_list=[]
+        for file in att_bsc_files_list:
+            att_bsc_files_no_path_list.append(re.split(r'/', file)[-1])
+        
+        vol_depol_files_no_path_list=[]
+        for file in vol_depol_files_list:
+            vol_depol_files_no_path_list.append(re.split(r'/', file)[-1])
+        
+        ## sort lists
+        att_bsc_files_no_path_list.sort()
+        vol_depol_files_no_path_list.sort()
+        for f in range(0,len(att_bsc_files_no_path_list)):
+            att_bsc_files_list[f] = str(path_to_folder) + "/" + str(att_bsc_files_no_path_list[f])
+            vol_depol_files_list[f] = str(path_to_folder) + "/" + str(vol_depol_files_no_path_list[f])
+
+        YYYY_file=str(re.split(r'_', att_bsc_files_no_path_list[0])[0])
+        MM_file=str(re.split(r'_', att_bsc_files_no_path_list[0])[1])
+        DD_file=str(re.split(r'_', att_bsc_files_no_path_list[0])[2])
+        
+        date_of_measurement_file = YYYY_file+MM_file+DD_file
+        if date_of_measurement_file == date_of_measurement:
+            pass
+        else:
+            date_of_measurement = date_of_measurement_file
+        
         print("\nData found for location {} on {}.".format(location,date_of_measurement))
         print("Data was found in folder: {}".format(path_to_folder))
-        print("New nc file '{}' will be generated and stored to '{}'".format(new_file_title, output_path))
+
+        print("\nFiles found:\n")
+        print(att_bsc_files_no_path_list)
+        print(vol_depol_files_no_path_list)
+        
+        ## generate new nc-file title
+        new_file_title = date_of_measurement + "_" + location.lower() + "_pollyxt.nc"
+
+        print("\nNew nc file '{}' will be generated and stored to '{}'".format(new_file_title, output_path))
         print("Processing...")
+
     else:
         print("\nNo data found for location {} on {}. Correct path?\n".format(location,date_of_measurement))
         sys.exit()
-        
-
-    ## set the searchpatterns for the att_bsc- & the vol_depol-files:
-    searchpattern_att_bsc   = "*[0-9]_att*.nc"
-    searchpattern_vol_depol = "*[0-9]_vol*.nc"
-    
-    ## get all att_bsc-files in path_to_folder
-    ## and put them into a list
-    
-    att_bsc_files       = Path(r'{}'.format(path_to_folder)).glob('{}'.format(searchpattern_att_bsc))
-    att_bsc_files_list0 = [x for x in att_bsc_files if x.is_file()]
-        
-    ## convert type path to type string
-    att_bsc_files_list = []
-    for file in att_bsc_files_list0:
-        att_bsc_files_list.append(str(file))
-    
-    ## get all vol_depol-_files in path_to_folder
-    ## and put them into a list
-    vol_depol_files       = Path(r'{}'.format(path_to_folder)).glob('{}'.format(searchpattern_vol_depol))
-    vol_depol_files_list0 = [x for x in vol_depol_files if x.is_file()]
-        
-    ## convert type path to type string
-    vol_depol_files_list = []
-    for file in vol_depol_files_list0:
-        vol_depol_files_list.append(str(file))
-    
-    ## get location from global attributes
-#    first_file_ds = Dataset(att_bsc_files_list[0], "r")
-#    position      = 0
-#    for att in first_file_ds.ncattrs():
-#        if att == "location":
-#            location_pos=position
-#        position = position + 1
-#    location = first_file_ds.getncattr(first_file_ds.ncattrs()[location_pos])
-#    first_file_ds.close()
-    
-    ## create new filename from the splitted files
-#    new_file_title = str(att_bsc_files_list[0])
-#    new_file_title = re.split(r'/', new_file_title)[-1]
-#    new_file_title = re.split(r'_', str(new_file_title))
-#    new_file_title = new_file_title[0] + new_file_title[1] + new_file_title[2] + "_" + location.lower() + "_pollyxt.nc"
-#    new_file_title = YYYY + MM + DD + location.lower() + "_pollyxt.nc"
     
     
     ## generate new nc file
     
     new_file_ds = Dataset(r"{}/{}".format(output_path, new_file_title), "w", format="NETCDF4")
-    #new_file_ds = Dataset(r"{}/{}".format(path_to_folder, new_file_title), "w", format="NETCDF4")
     
     ## create dimensions
     
@@ -285,27 +301,33 @@ def concat_pollyxt_files(date_of_measurement, location, input_path, output_path)
         times[startpos:startpos+dimsize] = file_ds.variables["time"][0:dimsize]
         
         # get SNR_1064nm and quality_mask for corrections of att_bsc (later...)
-        if startpos == 0:
-            SNR_all          = np.array(file_ds.variables['SNR_1064nm'])
-            quality_mask_all = np.array(file_ds.variables['quality_mask_1064nm'])
+        if 'SNR_1064nm' in file_ds.variables.keys() and 'quality_mask_1064nm' in file_ds.variables.keys():
+            if startpos == 0:
+                SNR_all          = np.array(file_ds.variables['SNR_1064nm'])
+                quality_mask_all = np.array(file_ds.variables['quality_mask_1064nm'])
+            else:
+                SNR              = np.array(file_ds.variables['SNR_1064nm'])
+                SNR_all          = np.concatenate((SNR_all,SNR),axis=0)
+                quality_mask     = np.array(file_ds.variables['quality_mask_1064nm'])
+                quality_mask_all = np.concatenate((quality_mask_all,quality_mask),axis=0)
         else:
-            SNR              = np.array(file_ds.variables['SNR_1064nm'])
-            SNR_all          = np.concatenate((SNR_all,SNR),axis=0)
-            quality_mask     = np.array(file_ds.variables['quality_mask_1064nm'])
-            quality_mask_all = np.concatenate((quality_mask_all,quality_mask),axis=0)
+            pass
         
         # append attenuated_backscatter_1064nm values
         beta[startpos:startpos+dimsize,:] = file_ds.variables["attenuated_backscatter_1064nm"][0:dimsize,:]
         
         # get calibration_factor from all files
-        position = 0
-        for attribute in file_ds.variables["attenuated_backscatter_1064nm"].ncattrs():
-            if attribute == "Lidar_calibration_constant_used":
-                calib_pos = position
-            position = position + 1
-            
-        calibration_factor[:] = file_ds.variables["attenuated_backscatter_1064nm"].getncattr(file_ds.variables["attenuated_backscatter_1064nm"].ncattrs()[calib_pos])
-        calibration_factor_list.append(calibration_factor[:])
+        if 'Lidar_calibration_constant_used' in file_ds.variables["attenuated_backscatter_1064nm"].ncattrs():
+            position = 0
+            for attribute in file_ds.variables["attenuated_backscatter_1064nm"].ncattrs():
+                if attribute == "Lidar_calibration_constant_used":
+                    calib_pos = position
+                position = position + 1
+                
+            calibration_factor[:] = file_ds.variables["attenuated_backscatter_1064nm"].getncattr(file_ds.variables["attenuated_backscatter_1064nm"].ncattrs()[calib_pos])
+            calibration_factor_list.append(calibration_factor[:])
+        else:
+           pass
         
         # set new startpos for appended matrices
         startpos = startpos + dimsize
@@ -328,7 +350,8 @@ def concat_pollyxt_files(date_of_measurement, location, input_path, output_path)
     times[:] = unix_to_utc
     
     # set calibration_factor as the mean value from all files
-    calibration_factor[:] = np.mean(calibration_factor_list)
+    if len(calibration_factor_list)>0:
+        calibration_factor[:] = np.mean(calibration_factor_list)
             
     # append vol_depol_532nm values from vol_depol-input files
     startpos = 0
@@ -351,8 +374,11 @@ def concat_pollyxt_files(date_of_measurement, location, input_path, output_path)
         if attribute == "source":
             source_pos     = position
         position = position + 1
-        
-    new_file_ds.setncattr("Data Policy", first_file_ds.getncattr(first_file_ds.ncattrs()[datapolicy_pos]))
+    
+    policy="Each PollyNET site has Principal Investigator(s) (PI), responsible for deployment, maintenance and data collection. Information on which PI is responsible can be gathered via polly@tropos.de. The PI has priority use of the data collected at the site. The PI is entitled to be informed of any use of that data. Mandatory guidelines for data use and publication: Using PollyNET data or plots (also for presentations/workshops): Please consult with the PI or the PollyNET team (see contact_mail contact) before using data or plots! This will help to avoid misinterpretations of the lidar data and avoid the use of data from periods of malfunction of the instrument. Using PollyNET images/data on external websites: PIs and PollyNET must be asked for agreement and a link directed to polly.tropos.de must be included. Publishing PollyNET data and/or plots data: Offer authorship for the PI(s)! Acknowledge projects which have made the measurements possible according to PI(s) recommendation. PollyNET requests a notification of any published papers or reports or a brief description of other uses (e.g., posters, oral presentations, etc.) of data/plots used from PollyNET. This will help us determine the use of PollyNET data, which is helpful in optimizing product development and acquire new funding for future measurements. It also helps us to keep our product-related references up-to-date."
+
+    #new_file_ds.setncattr("Data Policy", first_file_ds.getncattr(first_file_ds.ncattrs()[datapolicy_pos]))
+    new_file_ds.setncattr("Data Policy", policy)
     new_file_ds.setncattr("location", first_file_ds.getncattr(first_file_ds.ncattrs()[location_pos]))
     new_file_ds.setncattr("institute", "Leibniz Institute for Tropospheric Research (TROPOS)")
     new_file_ds.setncattr("source", first_file_ds.getncattr(first_file_ds.ncattrs()[source_pos]))
